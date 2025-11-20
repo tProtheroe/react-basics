@@ -14,14 +14,16 @@
     <script src="https://unpkg.com/supersimpledev/babel.js"></script>
     <script type="text/babel">
 
-      function ChatInput({ chatMessages, setChatMessages }) {
+      function ChatInput({ chatMessages, setChatMessages, state, updateIsLoading }) {
         const [ inputText, setInputText ] = React.useState("");
 
         function saveInputText(event) {
           setInputText(event.target.value);
         }
 
-        function sendMessage() {
+        async function sendMessage() {
+          if (inputText === "") return
+          
           const newChatMessages = [
             ...chatMessages,
             {
@@ -32,8 +34,20 @@
           ]
 
           setChatMessages(newChatMessages);
+          setInputText("");
 
-          const response = Chatbot.getResponse(inputText);
+          setChatMessages([
+            ...newChatMessages,
+            {
+              id: crypto.randomUUID(),
+              message: "Loading...",
+              sender: "robot"
+            }
+          ])
+
+          updateIsLoading(true)
+          const response = await Chatbot.getResponseAsync(inputText);
+          updateIsLoading(false)
           
           setChatMessages([
             ...newChatMessages,
@@ -43,8 +57,12 @@
               sender: "robot"
             }
           ]);
+        }
 
-          setInputText("");
+        function checkKeyDown(event) {
+          console.log(event.key)
+          event.key === 'Enter' ? sendMessage() : null
+          event.key === 'Escape' ? setInputText("") : null
         }
 
         return (
@@ -53,7 +71,9 @@
               placeholder="Type something" 
               size="30"
               onChange={ saveInputText }
+              onKeyDown={ checkKeyDown }
               value={ inputText }
+              disabled={ state }
             />
             <button
               onClick={ sendMessage }
@@ -100,6 +120,7 @@
       };
 
       function App() {
+        const [ isLoading, updateIsLoading ] = React.useState(false);
         const [ chatMessages, setChatMessages ] = React.useState([{
           id: 'id1',
           message: 'Hello there',
@@ -118,6 +139,8 @@
             <ChatInput 
               chatMessages={ chatMessages }
               setChatMessages={ setChatMessages }
+              updateIsLoading={ updateIsLoading }
+              state={ isLoading }
             />
             <ChatMessages 
               chatMessages={ chatMessages }
