@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chatbot</title>
+  </head>
+  <body>
+    <div class="js-container"></div>
+
+    <script src="https://unpkg.com/supersimpledev/react.js"></script>
+    <script src="https://unpkg.com/supersimpledev/react-dom.js"></script>
+
+    <script src="https://unpkg.com/supersimpledev/chatbot.js"></script>
+
+    <script src="https://unpkg.com/supersimpledev/babel.js"></script>
+    <script type="text/babel">
+
+      function Input({ inputValue, updateInputValue, updateWord }) {
+
+        function updateWordParagraph(event) {
+          const value = event.target.value;
+
+          updateWord(value);
+          updateInputValue(value);
+        }
+
+        return (
+          <input 
+            onChange={ () => updateWordParagraph(event) }
+            value={ inputValue }
+            type="text" 
+          />
+        )
+      }
+
+      function Paragraph({ word }) {
+        return (
+          <p>{ word }</p>
+        )
+      }
+
+      function ResetButton({ updateWord, updateInputValue }) {
+
+        function resetValues() {
+          updateInputValue("");
+          updateWord("");
+        }
+
+        return (
+          <button
+            onClick={ () => resetValues() }
+          >
+            Reset
+          </button>
+        )
+      }
+
+      function ExampleButton({updateWord, updateInputValue}) {
+
+        function setExample() {
+          const exampleString = "Alice";
+
+          updateWord(exampleString);
+          updateInputValue(exampleString);
+        }
+
+        return (
+          <button
+            onClick={ () => setExample() }
+          >
+            Example
+          </button>  
+        )
+      }
+
+      function App() {
+        const [ word, updateWord ] = React.useState("");
+        const [ inputValue, updateInputValue ] = React.useState("");
+
+        return (
+          <>
+            <Input 
+              inputValue={ inputValue }
+              updateInputValue={ updateInputValue }
+              updateWord={ updateWord }
+            />
+            <ResetButton
+              updateWord={ updateWord }
+              updateInputValue={ updateInputValue }
+            />
+            <ExampleButton
+              updateInputValue={ updateInputValue }
+              updateWord={ updateWord }
+            />
+            <Paragraph 
+              word={ "Hello " + word }
+            />
+          </> 
+        )
+      };
+
+      const container = document.querySelector('.js-container');
+      ReactDOM.createRoot(container).render(<App />);
+    </script>
+  </body>
+</html>
